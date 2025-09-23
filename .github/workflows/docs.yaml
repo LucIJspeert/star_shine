@@ -31,7 +31,7 @@ jobs:
         env:
           LOGO: "https://raw.githubusercontent.com/LucIJspeert/star_shine/master/star_shine/data/images/Star_Shine_small_transparent.png"
         run: |
-          pdoc star_shine !star_shine.gui \
+          uv run pdoc star_shine !star_shine.gui \
             -o docs \
             --docformat numpy \
             --logo "${{ env.LOGO }}"
