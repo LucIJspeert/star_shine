@@ -29,7 +29,7 @@ class TestDataProperties(unittest.TestCase):
     def test_signal_to_noise_threshold(self):
         """Test the signal-to-noise threshold calculation for a regular time series without gaps."""
         # Calculate SNR threshold without gaps
-        fixed_snr_thr = -1
+        fixed_snr_thr = -1.
         mock_config_instance = dp.config
         mock_config_instance.snr_thr = fixed_snr_thr
 
@@ -44,7 +44,7 @@ class TestDataProperties(unittest.TestCase):
     def test_signal_to_noise_threshold_gap(self):
         """Test the signal-to-noise threshold calculation for a regular time series with gaps."""
         # Calculate SNR threshold without gaps
-        fixed_snr_thr = -1
+        fixed_snr_thr = -1.
         mock_config_instance = dp.config
         mock_config_instance.snr_thr = fixed_snr_thr
 
