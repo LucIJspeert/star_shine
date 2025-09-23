@@ -43,6 +43,9 @@ starshine-gui = "star_shine.gui.gui_app:launch_gui"
 repository = "https://github.com/LucIJspeert/star_shine"
 
 [build-system]
-requires = ["uv>=0.0.16,<1.0.0"]
+requires = [
+    "uv>=0.0.16,<1.0.0",
+    "uv.build"
+]
 build-backend = "uv.build.api"
 
