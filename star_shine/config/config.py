@@ -10,6 +10,20 @@ import importlib.resources
 from star_shine.config.descriptors import ValidType
 
 
+def get_config_path():
+    """Get the path to the configuration file
+
+    Returns
+    -------
+    str
+        Path to the config file
+    """
+    # Use importlib.resources to find the path
+    config_path = str(importlib.resources.files('star_shine.config').joinpath('config.yaml'))
+
+    return config_path
+
+
 class Config:
     """A singleton class that manages application configuration settings.
 
@@ -35,7 +49,7 @@ class Config:
         Initializes default settings if the configuration file is not found or invalid.
     """
     _instance = None
-    _config_path = os.path.join(os.path.dirname(__file__), 'config.yaml')
+    _config_path = get_config_path()
 
     # default settings below
     # General settings
@@ -406,17 +420,3 @@ def get_config():
         The singleton instance of Config.
     """
     return Config()
-
-
-def get_config_path():
-    """Get the path to the configuration file
-
-    Returns
-    -------
-    str
-        Path to the config file
-    """
-    # Use importlib.resources to find the path
-    config_path = str(importlib.resources.files('star_shine.config').joinpath('config.yaml'))
-
-    return config_path
