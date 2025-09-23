@@ -47,7 +47,8 @@ The GUI is optional functionality, and its dependencies can be included when ins
     pip install star_shine[gui]
 
 If there are issues launching the gui, pip may not have properly installed all Pyside6 dependencies. In that case try 
-installing Pyside6 separately with e.g. conda.
+installing Pyside6 separately with e.g. conda. 
+One may also try the extremely fast package manager UV by Astral (highly recommended).
 
 **Star Shine has only been tested in Python 3.11 and 3.12**. 
 Using older versions could result in unexpected errors, although any Python version >=3.8 is expected to work. 
