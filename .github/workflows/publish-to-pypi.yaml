@@ -25,8 +25,11 @@ jobs:
       - name: Install UV
         run: pip install uv
 
-      # Build and publish package using UV
-      - name: Build and publish package
+
+      - name: Build package
+        run: uv build
+
+      - name: Publish package
         env:
           PYPI_USERNAME: __token__
           PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
