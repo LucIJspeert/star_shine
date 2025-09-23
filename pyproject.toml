@@ -42,7 +42,7 @@ starshine-gui = "star_shine.gui.gui_app:launch_gui"
 [project.urls]
 repository = "https://github.com/LucIJspeert/star_shine"
 
-[tool.uv]
+[tool.uv.package]
 # UV expects this section for files other than .py
 include = ["star_shine/data/*"]
 

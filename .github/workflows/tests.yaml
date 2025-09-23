@@ -40,6 +40,9 @@ jobs:
         restore-keys: |
           uv-${{ runner.os }}-${{ matrix.python-version }}-
 
+    - name: Create virtual environment
+      run: uv venv
+
     - name: Install dependencies using UV
       run: uv pip install --editable .
 
