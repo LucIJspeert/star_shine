@@ -1,5 +1,6 @@
 import unittest
 from star_shine.config.config import Config, get_config
+from star_shine.config.descriptors import ValidType
 
 class TestConfig(unittest.TestCase):
     def setUp(self):
@@ -71,8 +72,18 @@ class TestConfig(unittest.TestCase):
 
     def test_config_updates_from_dict(self):
         """Check if the configuration updates from dictionary without errors"""
-        valid_config = {key: getattr(Config, key) for key in dir(Config)
-                        if not callable(getattr(Config, key)) and not key.startswith('_')}
+        # build the configuration settings dictionary with the defaults
+        valid_config = {}
+        for key in dir(Config):
+            # avoid methods and private attributes
+            if not callable(getattr(Config, key)) and not key.startswith('_'):
+                # the use of descriptors requires some extra logic here
+                attr = getattr(Config, key)
+                if isinstance(attr, ValidType):
+                    default_value = attr._default() if callable(attr._default) else attr._default
+                else:
+                    default_value = attr
+                valid_config[key] = default_value
 
         # copy and remove two items
         incomplete_but_valid_config = valid_config.copy()

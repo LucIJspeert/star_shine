@@ -7,6 +7,8 @@ import os
 import yaml
 import importlib.resources
 
+from star_shine.config.descriptors import ValidType
+
 
 class Config:
     """A singleton class that manages application configuration settings.
@@ -37,47 +39,47 @@ class Config:
 
     # default settings below
     # General settings
-    verbose: bool = False
-    stop_at_stage: int = 0
+    verbose: bool = ValidType(bool, default=False)
+    stop_at_stage: int = ValidType(int, default=0)
 
     # Extraction settings
-    select_next: str = 'hybrid'
-    optimise_step: bool = True
-    replace_step: bool = True
-    stop_criterion: str = 'bic'
-    bic_thr: float = 2.
-    snr_thr: float = -1.
-    nyquist_factor: float = 1.
-    resolution_factor: float = 1.5
-    window_width: float = 1.
+    select_next: str = ValidType(str, default='hybrid')
+    optimise_step: bool = ValidType(bool, default=True)
+    replace_step: bool = ValidType(bool, default=True)
+    stop_criterion: str = ValidType(str, default='bic')
+    bic_thr: float = ValidType(float, default=2.)
+    snr_thr: float = ValidType(float, default=-1.)
+    nyquist_factor: float = ValidType(float, default=1.)
+    resolution_factor: float = ValidType(float, default=1.5)
+    window_width: float = ValidType(float, default=1.)
 
     # optimisation settings
-    min_group: int = 45
-    max_group: int = 50
+    min_group: int = ValidType(int, default=45)
+    max_group: int = ValidType(int, default=50)
 
     # Data and file settings
-    overwrite: bool = False
-    data_dir: str = ''
-    save_dir: str = ''
-    save_ascii: bool = False
+    overwrite: bool = ValidType(bool, default=False)
+    data_dir: str = ValidType(str, default='')
+    save_dir: str = ValidType(str, default='')
+    save_ascii: bool = ValidType(bool, default=False)
 
     # Tabulated files settings
-    cn_time: str = 'time'
-    cn_flux: str = 'flux'
-    cn_flux_err: str = 'flux_err'
+    cn_time: str = ValidType(str, default='time')
+    cn_flux: str = ValidType(str, default='flux')
+    cn_flux_err: str = ValidType(str, default='flux_err')
 
     # Fits files settings
-    cf_time: str = 'TIME'
-    cf_flux: str = 'SAP_FLUX'
-    cf_flux_err: str = 'SAP_FLUX_ERR'
-    cf_quality: str = 'QUALITY'
-    apply_q_flags: bool = True
-    halve_chunks: bool = False
+    cf_time: str = ValidType(str, default='TIME')
+    cf_flux: str = ValidType(str, default='SAP_FLUX')
+    cf_flux_err: str = ValidType(str, default='SAP_FLUX_ERR')
+    cf_quality: str = ValidType(str, default='QUALITY')
+    apply_q_flags: bool = ValidType(bool, default=True)
+    halve_chunks: bool = ValidType(bool, default=False)
 
     # GUI settings
-    dark_mode: bool = False
-    h_size_frac: float = 0.8
-    v_size_frac: float = 0.8
+    dark_mode: bool = ValidType(bool, default=False)
+    h_size_frac: float = ValidType(float, default=0.8)
+    v_size_frac: float = ValidType(float, default=0.8)
 
     def __new__(cls):
         """Ensures that only one instance of the Config class is created.
