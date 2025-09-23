@@ -1,12 +1,8 @@
 import unittest
-from star_shine.config.config import Config, get_config
+from star_shine.config.config import Config, get_config, get_config_path
 from star_shine.config.descriptors import ValidType
 
 class TestConfig(unittest.TestCase):
-    def setUp(self):
-        """Setup method to initialize the config instance"""
-        self.config_path = 'star_shine/data/config.yaml'
-
     def test_validate_config_valid_data(self):
         """Test with valid config data taken directly from the class"""
         valid_config = {key: getattr(Config, key) for key in dir(Config)
@@ -66,7 +62,7 @@ class TestConfig(unittest.TestCase):
         """Check if the configuration updates from file without errors"""
         try:
             config = Config()
-            config.update_from_file(self.config_path)
+            config.update_from_file(get_config_path())
         except Exception as e:
             self.fail(f"Configuration failed to update from file: {e}")
 

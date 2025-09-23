@@ -105,7 +105,7 @@ class Config:
         """
         if cls._instance is None:
             cls._instance = super(Config, cls).__new__(cls)
-            cls._load_config(cls._instance)
+            cls._instance._load_config()
 
         return cls._instance
 
@@ -153,7 +153,7 @@ class Config:
         try:
             with open(self._config_path, 'r') as file:
                 config_data = yaml.safe_load(file)
-                self._validate_config(config_data)
+                self.__class__._validate_config(config_data)
                 for key, value in config_data.items():
                     setattr(self._instance, key, value)
 

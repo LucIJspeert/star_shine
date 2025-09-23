@@ -93,12 +93,6 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(path, 'path/to/config.yaml')
         mock_get_config_path.assert_called_once()
 
-    def test_get_config_path_temp(self):
-        """Test get_config_path function."""
-        path = get_config_path()
-
-        print(path)
-
     @patch('importlib.resources.files', return_value=MagicMock(joinpath=MagicMock(return_value='path/to/images')))
     def test_get_images_path(self, mock_images_path):
         """Test get_images_path function."""
