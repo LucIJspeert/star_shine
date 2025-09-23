@@ -48,4 +48,4 @@ jobs:
 
     # Run tests
     - name: Run tests
-      run: python -m unittest discover tests "test_*.py"
+      run: uv run python -m unittest discover tests "test_*.py"
