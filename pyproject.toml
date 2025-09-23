@@ -41,3 +41,13 @@ starshine-gui = "star_shine.gui.gui_app:launch_gui"
 
 [project.urls]
 repository = "https://github.com/LucIJspeert/star_shine"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["star_shine*"]
+
+[tool.setuptools.package-data]
+"star_shine" = ["data/*"]
