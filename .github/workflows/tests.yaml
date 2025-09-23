@@ -41,7 +41,7 @@ jobs:
           uv-${{ runner.os }}-${{ matrix.python-version }}-
 
     - name: Install dependencies using UV
-      run: uv pip install
+      run: uv pip install --editable .
 
     # Run tests
     - name: Run tests
