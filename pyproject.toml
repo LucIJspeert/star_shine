@@ -46,3 +46,5 @@ repository = "https://github.com/LucIJspeert/star_shine"
 requires = ["uv>=0.0.16,<1.0.0"]
 build-backend = "uv.build.api"
 
+[tool.uv.extra-build-dependencies]
+star-shine = ["uv.build"]
