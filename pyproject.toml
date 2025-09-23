@@ -50,4 +50,4 @@ build-backend = "setuptools.build_meta"
 include = ["star_shine*"]
 
 [tool.setuptools.package-data]
-"star_shine" = ["data/*"]
+"star_shine" = ["data/*", "config/*.yaml", "config/*.dat"]
