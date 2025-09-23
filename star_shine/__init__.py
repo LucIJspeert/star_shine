@@ -43,6 +43,7 @@ The GUI is optional functionality, and its dependencies can be included when ins
 
 If there are issues launching the GUI, not all Pyside6 dependencies may have been installed (by e.g. pip).
 In that case try installing Pyside6 separately through conda.
+One may also try the extremely fast package manager UV by Astral (highly recommended).
 
 ### Notes on library versions
 
