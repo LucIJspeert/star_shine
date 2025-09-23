@@ -1,0 +1,51 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - master
+      - development
+  pull_request:
+    branches:
+      - master
+      - development
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ['3.11', '3.12']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    # Install UV
+    - name: Install UV
+      run: pip install uv
+
+    # Cache UV dependencies
+    - name: Cache UV dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: uv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}
+        restore-keys: |
+          uv-${{ runner.os }}-${{ matrix.python-version }}-
+
+    - name: Create virtual environment
+      run: uv venv
+
+    - name: Install dependencies using UV
+      run: uv pip install --editable .
+
+    # Run tests
+    - name: Run tests
+      run: uv run python -m unittest discover tests "test_*.py"

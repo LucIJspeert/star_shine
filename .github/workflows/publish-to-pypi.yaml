@@ -1,0 +1,36 @@
+name: Publish Python Package
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  pypi-publish:
+    name: Upload release to PyPI
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write  # Required for Trusted Publishing
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      # Install UV
+      - name: Install UV
+        run: pip install uv
+
+
+      - name: Build package
+        run: uv build
+
+      - name: Publish package
+        env:
+          PYPI_USERNAME: __token__
+          PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: uv publish
