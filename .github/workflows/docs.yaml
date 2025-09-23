@@ -18,47 +18,25 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
+      # Install UV
+      - name: Install UV
+        run: pip install uv
 
-      - name: Add pdoc to Poetry dev dependencies
-        run: |
-          poetry add --group dev pdoc
+      # Install dev dependencies including pdoc
+      - name: Install dev dependencies
+        run: uv add --dev pdoc
 
-      # Cache Poetry dependencies and virtual environment to speed up builds
-      - name: Cache Poetry dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/pypoetry
-            ~/.virtualenvs
-          key: poetry-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            poetry-${{ runner.os }}-${{ matrix.python-version }}-
-
-      # Report whether the cache was hit or missed
-      - name: Report cache usage
-        run: |
-          if [ "${{ steps.cache.outputs.cache-hit }}" = "true" ]; then
-            echo "Poetry cache was HIT."
-          else
-            echo "Poetry cache was MISSED. Dependencies will be freshly installed."
-          fi
-
-      - name: Install dependencies with Poetry
-        run: |
-          poetry install
-
-      # This is where pdoc does the work (called with poetry to run in the right env)
+      # Generate docs with pdoc
       - name: Generate docs with pdoc into /docs
         env:
           LOGO: "https://raw.githubusercontent.com/LucIJspeert/star_shine/master/star_shine/data/images/Star_Shine_small_transparent.png"
         run: |
-          poetry run pdoc star_shine !star_shine.gui \
+          pdoc star_shine !star_shine.gui \
             -o docs \
             --docformat numpy \
             --logo "${{ env.LOGO }}"
 
+      # Commit and push updated docs
       - name: Commit and push updated docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

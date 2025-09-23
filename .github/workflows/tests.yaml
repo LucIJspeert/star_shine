@@ -3,12 +3,12 @@ name: Tests
 on:
   push:
     branches:
-      - master  # Trigger on pushes to the main branch
-      - development  # Trigger on pushes to the development branch
+      - master
+      - development
   pull_request:
     branches:
-      - master  # Trigger on pull requests to the main branch
-      - development  # Trigger on pull requests to the development branch
+      - master
+      - development
 
 jobs:
   build:
@@ -25,37 +25,24 @@ jobs:
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
-        python-version: ${{ matrix.python-version }}  # Specify the Python version
+        python-version: ${{ matrix.python-version }}
 
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
+    # Install UV
+    - name: Install UV
+      run: pip install uv
 
-    # Cache Poetry dependencies and virtual environment to speed up builds
-    - name: Cache Poetry dependencies
+    # Cache UV dependencies
+    - name: Cache UV dependencies
       uses: actions/cache@v3
       with:
-        path: |
-          ~/.cache/pypoetry
-          ~/.virtualenvs
-        key: poetry-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+        path: ~/.cache/pip
+        key: uv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}
         restore-keys: |
-          poetry-${{ runner.os }}-${{ matrix.python-version }}-
+          uv-${{ runner.os }}-${{ matrix.python-version }}-
 
-    # Report whether the cache was hit or missed
-    - name: Report cache usage
-      run: |
-        if [ "${{ steps.cache.outputs.cache-hit }}" = "true" ]; then
-          echo "Poetry cache was HIT."
-        else
-          echo "Poetry cache was MISSED. Dependencies will be freshly installed."
-        fi
+    - name: Install dependencies using UV
+      run: uv install
 
-    # Install dependencies listed in pyproject.toml using Poetry
-    - name: Install dependencies using Poetry
-      run: |
-        poetry install
-
-    # Run your test suite using Poetry's virtual environment
+    # Run tests
     - name: Run tests
-      run: |
-        poetry run python -m unittest discover tests "test_*.py"
+      run: python -m unittest discover tests "test_*.py"
