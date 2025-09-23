@@ -31,9 +31,6 @@ jobs:
     - name: Install UV
       run: pip install uv
 
-    - name: Install uv.build
-      run: uv pip install uv.build
-
     # Cache UV dependencies
     - name: Cache UV dependencies
       uses: actions/cache@v3
@@ -45,6 +42,9 @@ jobs:
 
     - name: Create virtual environment
       run: uv venv
+
+    - name: Install uv.build
+      run: uv pip install uv.build
 
     - name: Install dependencies using UV
       run: uv pip install --editable .
