@@ -842,19 +842,23 @@ def reduce_sinusoids(ts_model, logger=None):
 def select_sinusoids(ts_model, logger=None):
     """Selects the credible frequencies from the given set
 
+    Harmonic frequencies that are said to be passing the criteria are in fact passing the criteria for
+    individual frequencies, not those for a set of harmonics (which would be a looser constraint).
+
+    Updates the ts_model sinusoid error values.
+    Also updates the linear model error values for completeness.
+
     Parameters
     ----------
     ts_model: tms.TimeSeriesModel
         Instance of TimeSeriesModel containing the time series and model parameters.
     logger: logging.Logger, optional
         Instance of the logging library.
-
-    Notes
-    -----
-    Harmonic frequencies that are said to be passing the criteria are in fact passing the criteria for
-    individual frequencies, not those for a set of harmonics (which would be a looser constraint).
     """
     n_sin = ts_model.sinusoid.n_sin
+
+    # update linear model errors in the model
+    ts_model.update_linear_uncertainties()
 
     # update the sinusoid errors in the model
     ts_model.update_sinusoid_uncertainties()
