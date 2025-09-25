@@ -235,38 +235,33 @@ class PlotWidget(QWidget):
         """
         # see if there is data in kwargs for any of the plot types
         for plot_type in self.plot_type_list:
-            # go through the supplied and existing plot properties to check lengths
-            n_existing = 0
-            n_supplied = 0
+            # go through the supplied plot properties to check lengths
+            n_target = 0  # find the max length
             for plot_property in self.plot_property_list:
                 key = plot_type + plot_property
-                n_existing = max(n_existing, len(getattr(self, key)))  #  take the max length
-                if key in kwargs.keys():
-                    n_supplied = max(n_supplied, len(kwargs[key]))  #  take the max length
-
-            # positive if more data supplied than existing plots
-            n_diff = n_supplied - n_existing
+                if key in kwargs:
+                    n_target = max(n_target, len(kwargs[key]))
 
             # go through the plot properties to set them accordingly
             for plot_property in self.plot_property_list:
                 key = plot_type + plot_property
-                if key in kwargs.keys() and (len(kwargs[key]) == n_supplied):
-                    # set the plot property to the supplied value(s)
-                    setattr(self, key, kwargs[key])
-                elif key in kwargs.keys():
-                    # set the plot property to the supplied value(s) and extend them with fill values
-                    setattr(self, key, kwargs[key])
-                    n_diff_i = n_supplied - len(kwargs[key])
-                    getattr(self, key).extend([self.property_fill_values[plot_property] for _ in range(n_diff_i)])
-                elif n_existing == 0:
-                    # set the plot property to its fill value(s)
-                    setattr(self, key, [self.property_fill_values[plot_property] for _ in range(n_supplied)])
-                elif n_existing < n_supplied:
-                    # extend the plot property with its fill value(s)
-                    getattr(self, key).extend([self.property_fill_values[plot_property] for _ in range(n_diff)])
-                else:  # n_existing >= n_supplied
-                    # remove excess plot properties
-                    setattr(self, key, getattr(self, key)[:n_supplied])
+                fill_value = self.property_fill_values[plot_property]
+
+                # Get supplied values, or use existing, or start fresh
+                if key in kwargs:
+                    values = list(kwargs[key])  # make a copy
+                elif hasattr(self, key):
+                    values = list(getattr(self, key))
+                else:
+                    values = []
+
+                # Normalise length
+                if len(values) < n_target:
+                    values.extend([fill_value] * (n_target - len(values)))
+                elif len(values) > n_target:
+                    values = values[:n_target]
+
+                setattr(self, key, values)
 
         return None
 
