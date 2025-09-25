@@ -50,7 +50,7 @@ class TimeSeries:
     """
 
     def __init__(self, time, flux, flux_err, i_chunks):
-        """Initialises the Result object.
+        """Initialises the TimeSeries object.
 
         Parameters
         ----------
@@ -120,7 +120,7 @@ class TimeSeriesModel(TimeSeries):
     """
 
     def __init__(self, time, flux, flux_err, i_chunks):
-        """Initialises the Result object.
+        """Initialises the TimeSeriesModel object.
 
         Parameters
         ----------
