@@ -454,7 +454,7 @@ def fit_multi_sinusoid_grouped(ts_model, g_min=45, g_max=50, logger=None):
     i_h = np.arange(len(harmonics))[harmonics]
     i_non_h = np.arange(len(harmonics))[~harmonics]
 
-    # remove harmonics from the sinusoids (to be fitted)
+    # get the sinusoid parameters
     f_n = ts_model.sinusoid.f_n
     a_n = ts_model.sinusoid.a_n
     ph_n = ts_model.sinusoid.ph_n
