@@ -6,6 +6,7 @@ This Python module contains classes for handling the time series, including comb
 import numpy as np
 
 from star_shine.core import model as mdl, goodness_of_fit as gof, periodogram as pdg
+from star_shine.core import utility as ut
 from star_shine.config import data_properties as dp
 
 
@@ -197,6 +198,16 @@ class TimeSeriesModel(TimeSeries):
             BIC of the current time series model.
         """
         return gof.calc_bic(self.residual(), self.n_param)
+
+    def noise_level(self):
+        """Calculate the standard deviation of the residual (or noise level).
+
+        Returns
+        -------
+        float
+            Noise level of the current time series model.
+        """
+        return ut.std_unb(self.residual(), len(self.time) - self.n_param)
 
     def periodogram(self, subtract_model=True):
         """Get the Lomb-Scargle periodogram of the time series.
