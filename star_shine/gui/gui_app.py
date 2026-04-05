@@ -69,7 +69,7 @@ class MainWindow(QMainWindow):
 
         # custom gui-specific logger (will be reloaded and connected when data is loaded)
         self.logger = gui_log.get_custom_gui_logger('gui_logger', '')
-        self.logger.log_signal.connect(self.append_text)
+        self.logger.log_signal.connect(self.on_result_update)
 
         # add the api classes for functionality
         self.pipeline = None
@@ -336,6 +336,11 @@ class MainWindow(QMainWindow):
         optimise_button.clicked.connect(functools.partial(self.perform_analysis, 'optimise_sinusoid'))
         button_layout.addWidget(optimise_button, 1, 0)
 
+        # Button for starting sinusoid sampling
+        sample_button = QPushButton("Sample")
+        sample_button.clicked.connect(functools.partial(self.perform_analysis, 'sample_sinusoid'))
+        button_layout.addWidget(sample_button, 1, 1)
+
         # Button for inputting a base harmonic
         add_harmonic_button = QPushButton("Add Base Harmonic")
         add_harmonic_button.clicked.connect(self.add_base_harmonic)
@@ -583,6 +588,19 @@ class MainWindow(QMainWindow):
             else: # only show residual if toggle checked
                 lower_plot_data['plot_xs'] = [freqs]
                 lower_plot_data['plot_ys'] = [ampls]
+
+        # todo: temp - add mcmc hdi - why is the lengths only 35?
+        print(len(self.pipeline.result.f_n_hdi))
+        if len(self.pipeline.result.f_n_hdi) != 0:
+            lower_plot_data['vlines_xs'].append(self.pipeline.result.f_n)
+            lower_plot_data['vlines_ys'].append(self.pipeline.result.a_n)
+            lower_plot_data['vlines_colors'].append('tab:orange')
+            lower_plot_data['vlines_xs'].append(self.pipeline.result.f_n - self.pipeline.result.f_n_hdi[:, 0])
+            lower_plot_data['vlines_ys'].append(self.pipeline.result.a_n)
+            lower_plot_data['vlines_colors'].append('tab:red')
+            lower_plot_data['vlines_xs'].append(self.pipeline.result.f_n + self.pipeline.result.f_n_hdi[:, 1])
+            lower_plot_data['vlines_ys'].append(self.pipeline.result.a_n)
+            lower_plot_data['vlines_colors'].append('tab:purple')
 
         # set the plot data
         self.upper_plot_area.set_plot_data(**upper_plot_data)

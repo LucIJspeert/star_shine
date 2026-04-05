@@ -10,8 +10,8 @@ import numpy as np
 from star_shine.api.data import Data
 from star_shine.api.result import Result
 
-from star_shine.core import analysis as ana, time_series as tms
-from star_shine.core import periodogram as pdg, fitting as fit, utility as ut
+from star_shine.core import analysis as ana, time_series as tms, periodogram as pdg
+from star_shine.core import fitting as fit, mcmc as mc, utility as ut
 from star_shine.config.helpers import get_config, get_custom_logger
 
 
@@ -204,37 +204,12 @@ class Pipeline:
         # optimisation
         fit.fit_multi_sinusoid_grouped(self.ts_model, g_min=config.min_group, g_max=config.max_group,
                                        logger=self.logger)
-            # # make model including everything to calculate noise level
-            # resid = self.data.time_series.flux - self.ts_model.model_linear() - self.ts_model.model_sinusoid()
-            # n_param = 2 * len(self.result.const) + 3 * len(self.result.f_n)
-            # noise_level = ut.std_unb(resid, len(self.data.time_series.time) - n_param)
-            #
-            # # formal linear and sinusoid parameter errors
-            # out_a = ut.formal_uncertainties(self.data.time_series.time, resid, self.data.time_series.flux_err,
-            #                                 self.result.a_n, self.data.time_series.i_chunks)
-            # c_err, sl_err, f_n_err, a_n_err, ph_n_err = out_a
-            #
-            # # do not include those frequencies that have too big uncertainty
-            # include = (ph_n_err < 1 / np.sqrt(6))  # circular distribution for ph_n cannot handle these
-            # f_n, a_n, ph_n = self.result.f_n[include], self.result.a_n[include], self.result.ph_n[include]
-            # f_n_err, a_n_err, ph_n_err = f_n_err[include], a_n_err[include], ph_n_err[include]
-            #
-            # # Monte Carlo sampling of the model
-            # out_b = mcf.sample_sinusoid(self.data.time_series.time, self.data.time_series.flux, self.result.const,
-            #                             self.result.slope, f_n, a_n, ph_n, self.result.c_err, self.result.sl_err,
-            #                             f_n_err, a_n_err, ph_n_err, noise_level, self.data.time_series.i_chunks,
-            #                             logger=self.logger)
-            # inf_data, par_mean, par_hdi = out_b
-            # self.result.from_dict(c_hdi=par_hdi[0], sl_hdi=par_hdi[1], f_n_hdi=par_hdi[2], a_n_hdi=par_hdi[3],
-            #                       ph_n_hdi=par_hdi[4])
 
         # remove any frequencies that end up not making the statistical cut
         ana.reduce_sinusoids(self.ts_model, logger=self.logger)
 
         # update the TimeSeriesModel passing masks and uncertainties
         ana.select_sinusoids(self.ts_model, logger=self.logger)
-
-        # ut.save_inference_data(file_name, inf_data)  # currently not saved
 
         # print some useful info
         t_b = systime.time()
@@ -244,7 +219,12 @@ class Pipeline:
         return None
 
     def add_base_harmonic(self, f_base):
-        """Add a base harmonic frequency to the model."""
+        """Add a base harmonic frequency to the model.
+
+        If the given frequency is within the error region of another sinusoid, that sinusoid will be assigned as
+        the base frequency.
+        """
+        # todo: f_within_rayleigh check (no actually within err region)
         # get amplitude and phase
         a, ph = pdg.scargle_ampl_phase_single(self.ts_model.time, self.ts_model.residual(), f_base)
 
@@ -318,6 +298,37 @@ class Pipeline:
             self.logger.warning(f"Time-base over period is less than two: {t_over_p}.")
         elif self.ts_model.sinusoid.n_harm < 2:
             self.logger.warning(f"Not enough harmonics found: {self.ts_model.sinusoid.n_harm}.")
+
+        return None
+
+    def sample_sinusoid(self):
+        """Sample the parameters of the sinusoid and linear model for uncertainty regions
+
+        This function only updates the highest density interval in the result instance. It does not influence the
+        sinusoid parameters.
+
+        Returns
+        -------
+        Result
+            Instance of the Result class containing the analysis results
+        """
+        t_a = systime.time()
+        self.logger.info("Starting MCMC sampling.")
+
+        # Monte Carlo sampling of the model
+        out_b = mc.sample_sinusoid(self.ts_model, logger=self.logger)
+        inf_data, par_mean, par_hdi = out_b
+
+        self.result.from_dict(const_hdi=par_hdi[0], slope_hdi=par_hdi[1], f_n_hdi=par_hdi[2], a_n_hdi=par_hdi[3],
+                              ph_n_hdi=par_hdi[4])
+
+        # ut.save_inference_data(file_name, inf_data)  # currently not saved
+
+        # print some useful info
+        t_b = systime.time()
+        self.logger.info(f"N_f= {self.ts_model.sinusoid.n_sin}, BIC= {self.ts_model.bic():1.2f}, "
+                         f"N_p= {self.ts_model.n_param} - Sampling complete. Time taken: {t_b - t_a:1.1f}s.",
+                         extra={'update': True})
 
         return None
 

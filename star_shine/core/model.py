@@ -328,7 +328,7 @@ class LinearModel:
         return 2 * self.n_chunks
 
     def update_n(self):
-        """Update the current numbers of sinusoids, harmonics, and base frequencies."""
+        """Update the current numbers of constants, and slopes."""
         self.n_chunks = len(self._const)
 
         return None

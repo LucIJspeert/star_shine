@@ -12,7 +12,6 @@ from star_shine.config.helpers import get_config, get_config_path
 config = get_config()
 # todo: modelling red-noise with autoregressive model
 # todo: amplitude factor for each sector (linear model)
-# todo: add MC uncertainty determination
 
 
 def update_config(file_name='', settings=None):
