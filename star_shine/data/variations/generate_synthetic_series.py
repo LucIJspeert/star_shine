@@ -94,31 +94,39 @@ def main() -> None:
     args = parser.parse_args()
 
     time, flux, components = generate_series()
+    flux_err = [0.01] * len(time)
 
-    with args.out.open("w", newline="") as handle:
-        writer = csv.writer(handle)
-        writer.writerow(["time", "flux"])
-        writer.writerows(zip(time, flux))
+    def write_series(path: Path, values: list[float]) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("w", newline="") as handle:
+            writer = csv.writer(handle)
+            writer.writerow(["time", "flux", "flux_err"])
+            writer.writerows(zip(time, values, flux_err))
+
+    write_series(args.out, flux)
+    for name, values in components.items():
+        component_out = args.out.with_name(f"{args.out.stem}_{name}{args.out.suffix}")
+        write_series(component_out, values)
 
     print(f"Saved {len(time)} samples to {args.out}")
     print(f"Median flux: {median(flux):.6f}")
     print(f"Minimum flux: {min(flux):.6f}")
 
-    # if args.plot:
-    import matplotlib.pyplot as plt
+    if args.plot:
+        import matplotlib.pyplot as plt
 
-    fig, axes = plt.subplots(6, 1, figsize=(11, 10), sharex=True)
-    axes[0].plot(time, flux, color="black", lw=1.0)
-    axes[0].set_ylabel("flux")
-    axes[0].set_title("Synthetic positive time series")
+        fig, axes = plt.subplots(6, 1, figsize=(11, 10), sharex=True)
+        axes[0].plot(time, flux, color="black", lw=1.0)
+        axes[0].set_ylabel("flux")
+        axes[0].set_title("Synthetic positive time series")
 
-    for axis, (name, values) in zip(axes[1:], components.items()):
-        axis.plot(time, values, lw=0.9)
-        axis.set_ylabel(name)
+        for axis, (name, values) in zip(axes[1:], components.items()):
+            axis.plot(time, values, lw=0.9)
+            axis.set_ylabel(name)
 
-    axes[-1].set_xlabel("time")
-    plt.tight_layout()
-    plt.show()
+        axes[-1].set_xlabel("time")
+        plt.tight_layout()
+        plt.show()
 
 
 if __name__ == "__main__":
