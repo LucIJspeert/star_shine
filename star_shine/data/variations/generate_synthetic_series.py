@@ -67,22 +67,24 @@ def generate_series(
         phase5 += math.tau * f5_inst * dt
         s5.append(a5 * math.sin(phase5))
 
-    signal = [sum(values) for values in zip(s1, s2, s3, s4, s5)]
+    def make_flux(values: list[float], scale: float = 0.22) -> list[float]:
+        """Convert a zero-centered component into a positive, median-normalized flux series."""
+        flux_values = [1.0 + scale * value for value in values]
+        min_flux = min(flux_values)
+        if min_flux <= 0.0:
+            flux_values = [value - min_flux + 0.05 for value in flux_values]
+        med_flux = median(flux_values)
+        return [value / med_flux for value in flux_values]
 
-    # Keep the series positive and set the median to about one.
-    flux = [1.0 + 0.22 * value for value in signal]
-    min_flux = min(flux)
-    if min_flux <= 0.0:
-        flux = [value - min_flux + 0.05 for value in flux]
-    med_flux = median(flux)
-    flux = [value / med_flux for value in flux]
+    signal = [sum(values) for values in zip(s1, s2, s3, s4, s5)]
+    flux = make_flux(signal)
 
     components = {
-        "pure_f1": s1,
-        "phase_jump_f2": s2,
-        "gradual_phase_f3": s3,
-        "amp_mod_f4": s4,
-        "freq_wander_f5": s5,
+        "pure_f1": make_flux(s1, scale=0.30),
+        "phase_jump_f2": make_flux(s2, scale=0.28),
+        "gradual_phase_f3": make_flux(s3, scale=0.26),
+        "amp_mod_f4": make_flux(s4, scale=0.24),
+        "freq_wander_f5": make_flux(s5, scale=0.22),
     }
     return time, flux, components
 
